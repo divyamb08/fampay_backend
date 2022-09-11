@@ -1,0 +1,16 @@
+FROM python:3
+
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /app
+
+ADD . /app
+
+COPY ./requirements.txt /app/requirements.txt
+
+RUN pip install -r requirements.txt
+
+COPY . /app
+
+CMD python manage.py runserver && celery -A fampay_backend.celery worker --pool=solo -l info && celery -A fampay_backend.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
